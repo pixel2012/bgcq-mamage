@@ -1,0 +1,106 @@
+/*重置部分elementUI组件样式*/
+body{
+    background-color: #ecebeb;
+}
+.w1200 {
+    width: 1200px;
+    min-width: 1200px;
+    margin: 0 auto;
+}
+
+.h100 {
+    height: 100%;
+}
+
+.el-container {
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.el-header,
+.el-main,
+.el-footer {
+    padding: 0;
+}
+
+.el-pagination {
+    margin-top: 15px;
+}
+
+.tl {
+    text-align: left;
+}
+
+.tc{
+    text-align: center;
+}
+
+.tr {
+    text-align: right;
+}
+
+a{
+    color:inherit;
+    font-size: inherit;
+    text-decoration: none;
+}
+
+.breadcrumb{
+    border-bottom: 1px solid #ECEBEB;
+}
+.el-breadcrumb__inner{
+    display: inline-block;
+    width: 100px;
+    padding:6px 0;
+    text-align: center;
+    color: #D10303 !important;
+    background-color: #fff;
+    border:1px solid #BBBABA;
+}
+.el-breadcrumb__inner.is-link{
+    color: #fff !important;
+    background-color: #bbbaba;
+}
+
+.footer {
+    color: #fff;
+    border-top: none;
+    padding: 40px 0;
+    text-align: left;
+    background-color: #161513;
+}
+
+.footer_map .f-l{
+    margin-left: 200px;
+}
+
+.footer_map .f-l:first-child{
+    margin-left: 100px;
+}
+
+.footer-title {
+    font-size: 24px;
+    margin-bottom: 20px;
+}
+
+.footer-item {
+    color: #a19992;
+    font-size: 14px;
+    margin-top: 10px;
+}
+
+.footer_copyright {
+    font-size: 14px;
+    text-align: center;
+}
+
+.copyright {
+    color: #fff;
+    padding: 40px 0;
+    background: url("../img/footer-bg.png") repeat-x bottom center #0a0a09;
+}
+
+.layout{
+    box-sizing: border-box;
+    background-color: #fff;
+}

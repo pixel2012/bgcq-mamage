@@ -1,0 +1,44 @@
+.top {
+    height: 112px !important;
+    background-color: #951c21;
+}
+.logo {
+    width: 80px;
+    height: 95px;
+    margin-top: 10px;
+}
+.user-center img,
+.user-center span {
+    display: inline-block;
+    vertical-align: middle;
+    margin: 20px 10px auto;
+    color: #fff;
+}
+.main {
+    margin: 60px 0;
+}
+.aside {
+    padding: 0 20px 10px 0;
+    box-sizing: border-box;
+}
+.aside-box,
+.sub-main-box {
+    box-sizing: border-box;
+    background-color: #fff;
+}
+.sub-main-box{
+    padding: 20px;
+}
+.nav-lists{
+    border-bottom: 1px solid #ECEBEB;
+}
+.nav-lists .nav-list{
+    display: inline-block;
+    padding:20px 0 20px 100px;
+}
+.nav-ico-1{
+    background: url("../img/icon-home.png") no-repeat 50px center;
+}
+.nav-ico-2{
+    background: url("../img/iocn-item.png") no-repeat 55px center;
+}
