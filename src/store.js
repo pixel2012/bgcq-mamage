@@ -71,7 +71,7 @@ let mutations = {
 let actions = {};
 
 let saveState = state => {
-  console.log('执行删除了');
+  console.log("执行删除了");
   localStore.set("navActive", state.navActive);
   localStore.set("tabMenusActive", state.tabMenusActive);
   localStore.set("tabMenus", state.tabMenus);

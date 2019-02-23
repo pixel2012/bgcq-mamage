@@ -27,13 +27,13 @@
                 <div class="nav-list nav-ico-2">
                   我的账号
                 </div>
-                <router-link class="nav-list" to="/">
+                <router-link class="nav-list" to="/modified">
                   修改资料
                 </router-link>
-                <router-link class="nav-list" to="/">
+                <router-link class="nav-list" to="/safety">
                   安全信息
                 </router-link>
-                <router-link class="nav-list" to="/">
+                <router-link class="nav-list" to="/like">
                   我的收藏
                 </router-link>
               </div>
@@ -41,7 +41,7 @@
                 <div class="nav-list nav-ico-2">
                   财务管理
                 </div>
-                <router-link class="nav-list" to="/">
+                <router-link class="nav-list" to="/pay">
                   在线支付
                 </router-link>
               </div>
@@ -49,13 +49,13 @@
                 <div class="nav-list nav-ico-2">
                   购物信息
                 </div>
-                <router-link class="nav-list" to="/">
+                <router-link class="nav-list" to="/order">
                   我的订单
                 </router-link>
                 <router-link class="nav-list" to="/carts">
                   我的购物车
                 </router-link>
-                <router-link class="nav-list" to="/">
+                <router-link class="nav-list" to="/address">
                   我的收货地址
                 </router-link>
               </div>
@@ -73,7 +73,7 @@
         <div class="footer">
           <el-row class="w1200">
             <el-col :span="6">
-              <img src="@/assets/img/qrcode.png" alt="">
+              <img src="@/assets/img/qrcode.png" alt="" />
             </el-col>
             <el-col :span="6">
               <div class="footer-title">大师坊</div>
@@ -129,7 +129,7 @@
           </el-row>
           <div class="w1200">
             <div class="f-l">
-              <img src="img/index/vipcn.png" alt="">
+              <img src="img/index/vipcn.png" alt="" />
             </div>
           </div>
         </div>

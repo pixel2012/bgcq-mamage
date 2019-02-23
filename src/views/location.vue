@@ -4,23 +4,32 @@
     <div class="sub-main-box">
       <el-container>
         <el-header>
-          <el-form :inline="true" :model="formInline" class="demo-form-inline">
-            <el-form-item label="审批人">
-              <el-input
-                v-model="formInline.user"
-                placeholder="审批人"
-              ></el-input>
-            </el-form-item>
-            <el-form-item label="活动区域">
-              <el-select v-model="formInline.region" placeholder="活动区域">
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域二" value="beijing"></el-option>
-              </el-select>
-            </el-form-item>
-            <el-form-item>
-              <el-button type="primary" @click="onSubmit">查询</el-button>
-            </el-form-item>
-          </el-form>
+          <el-row>
+            <el-col :span="12">
+              <el-button
+                type="danger"
+                :disabled="multipleSelection.length === 0"
+                >删除</el-button
+              >
+            </el-col>
+            <el-col :span="12">
+              <el-form
+                :inline="true"
+                :model="formInline"
+                class="demo-form-inline tr"
+              >
+                <el-form-item>
+                  <el-input
+                    v-model="formInline.key"
+                    placeholder="请输入关键词"
+                  ></el-input>
+                </el-form-item>
+                <el-form-item>
+                  <el-button type="primary" @click="onSubmit">查询</el-button>
+                </el-form-item>
+              </el-form>
+            </el-col>
+          </el-row>
         </el-header>
         <el-main>
           <el-table
@@ -29,7 +38,9 @@
             stripe
             style="width: 100%"
             height="100%"
+            @selection-change="handleSelectionChange"
           >
+            <el-table-column type="selection" width="55"> </el-table-column>
             <el-table-column prop="date" label="日期"> </el-table-column>
             <el-table-column prop="name" label="姓名"> </el-table-column>
             <el-table-column prop="province" label="省份"> </el-table-column>
@@ -44,7 +55,7 @@
                   size="small"
                   >查看</el-button
                 >
-                <el-button type="text" size="small">编辑</el-button>
+                <el-button type="text" size="small">删除</el-button>
               </template>
             </el-table-column>
           </el-table>
@@ -63,14 +74,14 @@
 // import HelloWorld from "@/components/HelloWorld.vue";
 
 export default {
-  name: "carts",
+  name: "location",
   components: {},
   data() {
     return {
       formInline: {
-        user: "",
-        region: ""
+        key: ""
       },
+      multipleSelection: [],
       tableData: [
         {
           date: "2016-05-03",
@@ -140,6 +151,9 @@ export default {
     };
   },
   methods: {
+    handleSelectionChange(val) {
+      this.multipleSelection = val;
+    },
     onSubmit() {
       console.log(this.formInline);
     }

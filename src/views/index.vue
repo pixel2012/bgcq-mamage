@@ -1,10 +1,6 @@
 <template>
   <div class="layout">
-    <div class="breadcrumb sub-main-box">
-      <el-breadcrumb separator-class="el-icon-arrow-right">
-        <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
-      </el-breadcrumb>
-    </div>
+    <breadcrumb :current="$route.meta.name"></breadcrumb>
     <div class="sub-main-box">
       <table border="1" cellspacing="0" bordercolor="#ECEBEB" class="tc">
         <tr>

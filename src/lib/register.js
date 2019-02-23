@@ -5,9 +5,10 @@ import utils from "./utils";
 import ajax from "./ajax";
 import { sessionStore, localStore } from "./store";
 import _ from "lodash";
+import breadcrumb from "../components/breadcrumb";
 
-let zhmf = {};
-zhmf.install = Vue => {
+let register = {};
+register.install = Vue => {
   // 1. 添加全局方法或属性
   // Vue.myGlobalMethod = function() {};
   // 2. 添加全局资源
@@ -21,6 +22,7 @@ zhmf.install = Vue => {
   //   created: function() {
   //   }
   // });
+  Vue.component("breadcrumb", breadcrumb);
 
   // 4. 添加实例方法
   // Vue.prototype.$myMethod = function (methodOptions) {
@@ -33,4 +35,4 @@ zhmf.install = Vue => {
   Vue.prototype.$localStore = localStore;
   Vue.prototype.$_ = _;
 };
-export default zhmf;
+export default register;

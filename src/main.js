@@ -4,12 +4,12 @@ import "element-ui/lib/theme-chalk/index.css";
 import App from "./App.vue";
 import router from "./router";
 import store from "./store";
-import zhmf from "./lib/zhmf";
+import register from "./lib/register";
 import "./registerServiceWorker";
 
 Vue.config.productionTip = false;
 Vue.use(ElementUI);
-Vue.use(zhmf);
+Vue.use(register);
 new Vue({
   router,
   store,
