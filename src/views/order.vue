@@ -32,40 +32,76 @@
           </el-row>
         </el-header>
         <el-main>
-          <el-table
-            :data="tableData"
-            border
-            stripe
-            style="width: 100%"
-            height="100%"
-            @selection-change="handleSelectionChange"
-          >
-            <el-table-column type="selection" width="55"> </el-table-column>
-            <el-table-column prop="date" label="日期"> </el-table-column>
-            <el-table-column prop="name" label="姓名"> </el-table-column>
-            <el-table-column prop="province" label="省份"> </el-table-column>
-            <el-table-column prop="city" label="市区"> </el-table-column>
-            <el-table-column prop="address" label="地址"> </el-table-column>
-            <el-table-column prop="zip" label="邮编"> </el-table-column>
-            <el-table-column fixed="right" label="操作" width="100">
-              <template slot-scope="scope">
-                <el-button
-                  @click="handleClick(scope.row)"
-                  type="text"
-                  size="small"
-                  >查看</el-button
+          <div class="order-lists">
+            <div class="order-item" v-for="item in tableData" :key="item.id">
+              <div class="order-title">
+                <span><el-checkbox v-model="item.checked"></el-checkbox></span>
+                <span class="order-date">{{ item.createTime }}</span>
+                <span class="order-id">订单编号：{{ item.id }}</span>
+                <el-button @click="look(item.id)" size="mini"
+                  >查看订单</el-button
                 >
-                <el-button type="text" size="small">删除</el-button>
-              </template>
-            </el-table-column>
-          </el-table>
+              </div>
+              <table
+                style="width:100%;"
+                border="1"
+                cellspacing="0"
+                bordercolor="#ECEBEB"
+                class="tc"
+              >
+                <tr v-for="product in item.productSkuList" :key="product.id">
+                  <td>
+                    <img
+                      :src="product.thumbPictureUrl"
+                      width="100%"
+                      height="200"
+                      alt=""
+                    />
+                  </td>
+                  <td>
+                    {{ product.name }}
+                  </td>
+                  <td>￥{{ product.skuPrice }}</td>
+                  <td>1</td>
+                  <td>
+                    <div>￥6000.00</div>
+                    <div>(含运费￥0.00)</div>
+                  </td>
+                  <td>
+                    待付款
+                  </td>
+                  <td>
+                    <el-button>撤销</el-button>
+                  </td>
+                </tr>
+              </table>
+            </div>
+          </div>
         </el-main>
         <el-footer>
-          <el-pagination background layout="prev, pager, next" :total="1000">
+          <el-pagination background layout="prev, pager, next" :total="15">
           </el-pagination>
         </el-footer>
       </el-container>
     </div>
+    <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
+      <el-form :model="form" inline>
+        <el-form-item
+          v-for="(value, key, i) in form"
+          :label="key + '：'"
+          :key="i"
+          :label-width="formLabelWidth"
+        >
+          {{ value }}
+        </el-form-item>
+      </el-form>
+      <div slot="footer" class="dialog-footer">
+        <el-button @click="dialogFormVisible = false">取 消</el-button>
+        <el-button type="primary" @click="dialogFormVisible = false"
+          >确 定</el-button
+        >
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -78,79 +114,74 @@ export default {
   components: {},
   data() {
     return {
+      checked: false,
       formInline: {
         key: ""
       },
       multipleSelection: [],
-      tableData: [
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        }
-      ]
+      tableData: [],
+      page: {
+        index: 1,
+        size: 10,
+        count: 0
+      },
+      dialogFormVisible: false,
+      form: {},
+      formLabelWidth: "120px"
     };
   },
+  mounted() {
+    this.getList();
+  },
   methods: {
+    getList() {
+      this.$ajax({
+        context: this,
+        url: this.$api.order.lists,
+        method: "get",
+        query: {
+          status: 0,
+          page: this.page.index,
+          size: this.page.size
+        },
+        body: {},
+        callback: data => {
+          console.log(data);
+          data.map(item => {
+            item.checked = false;
+          });
+          this.tableData = data;
+        },
+        failback: () => {
+          //result:false
+        },
+        errorback: () => {
+          //404,500
+        }
+      });
+    },
+    look(id) {
+      this.dialogFormVisible = true;
+      this.$ajax({
+        context: this,
+        url: this.$api.order.detail,
+        method: "get",
+        query: {
+          id
+        },
+        body: {},
+        callback: data => {
+          console.log(data);
+          this.form = data;
+        },
+        failback: () => {
+          //result:false
+        },
+        errorback: () => {
+          //404,500
+        }
+      });
+    },
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
@@ -160,4 +191,22 @@ export default {
   }
 };
 </script>
-<style scoped></style>
+<style scoped>
+.order-item {
+  margin-bottom: 40px;
+}
+.order-title {
+  margin-bottom: 20px;
+  background-color: #eee;
+  padding: 6px 10px;
+}
+.order-title span {
+  display: inline-block;
+}
+.order-date {
+  margin: 0 20px;
+}
+table td {
+  width: calc(100% / 8);
+}
+</style>
