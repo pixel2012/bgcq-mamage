@@ -5,6 +5,7 @@ import utils from "./utils";
 import ajax from "./ajax";
 import { sessionStore, localStore } from "./store";
 import _ from "lodash";
+import moment from "moment";
 import breadcrumb from "../components/breadcrumb";
 
 let register = {};
@@ -24,7 +25,16 @@ register.install = Vue => {
   // });
   Vue.component("breadcrumb", breadcrumb);
 
-  // 4. 添加实例方法
+  //4.添加过滤器
+  Vue.filter("dateFormate", function(value) {
+    if (value == 0) {
+      return "暂无";
+    } else {
+      return moment.unix(value).format("YYYY-MM-DD HH:mm"); // 这是时间戳转时间
+    }
+  });
+
+  // 5. 添加实例方法
   // Vue.prototype.$myMethod = function (methodOptions) {
   // }
   Vue.prototype.$config = config;
@@ -34,5 +44,6 @@ register.install = Vue => {
   Vue.prototype.$sessionStore = sessionStore;
   Vue.prototype.$localStore = localStore;
   Vue.prototype.$_ = _;
+  Vue.prototype.$moment = moment;
 };
 export default register;

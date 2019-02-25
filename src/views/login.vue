@@ -54,7 +54,7 @@ export default {
         if (valid) {
           this.$ajax({
             context: this,
-            url: this.$api.user.userLogin,
+            url: this.$api.user.login,
             method: "post",
             query: {
               a: 1

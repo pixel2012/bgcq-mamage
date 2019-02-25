@@ -55,7 +55,7 @@
                 <router-link class="nav-list" to="/carts">
                   我的购物车
                 </router-link>
-                <router-link class="nav-list" to="/address">
+                <router-link class="nav-list" to="/location">
                   我的收货地址
                 </router-link>
               </div>

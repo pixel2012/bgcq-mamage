@@ -44,6 +44,9 @@ a{
     font-size: inherit;
     text-decoration: none;
 }
+a.link{
+    color: #409eff;
+}
 
 .breadcrumb{
     border-bottom: 1px solid #ECEBEB;
@@ -103,4 +106,9 @@ a{
 .layout{
     box-sizing: border-box;
     background-color: #fff;
+}
+.empty{
+    text-align: center;
+    color: #666;
+    padding:40px 0;
 }

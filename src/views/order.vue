@@ -5,43 +5,70 @@
       <el-container>
         <el-header>
           <el-row>
-            <el-col :span="12">
-              <el-button
-                type="danger"
-                :disabled="multipleSelection.length === 0"
-                >删除</el-button
+            <el-col :span="4">
+              <el-button :disabled="multipleSelection.length === 0" size="mini"
+                >批量删除</el-button
               >
             </el-col>
-            <el-col :span="12">
+            <el-col :span="20">
               <el-form
                 :inline="true"
                 :model="formInline"
                 class="demo-form-inline tr"
               >
-                <el-form-item>
+                <el-form-item label="订单状态" prop="status">
+                  <el-select
+                    v-model="formInline.status"
+                    placeholder="请选择"
+                    size="mini"
+                  >
+                    <el-option :value="0" label="全部"></el-option>
+                    <el-option :value="1" label="待付款"></el-option>
+                    <el-option :value="2" label="待发货"></el-option>
+                    <el-option :value="3" label="待收货"></el-option>
+                    <el-option :value="4" label="待评价"></el-option>
+                  </el-select>
+                </el-form-item>
+                <el-form-item prop="key">
                   <el-input
                     v-model="formInline.key"
                     placeholder="商品标题/订单号"
+                    size="mini"
                   ></el-input>
                 </el-form-item>
                 <el-form-item>
-                  <el-button type="primary" @click="onSubmit">查询</el-button>
+                  <el-button type="primary" size="mini" @click="search"
+                    >查询</el-button
+                  >
                 </el-form-item>
               </el-form>
             </el-col>
           </el-row>
         </el-header>
         <el-main>
-          <div class="order-lists">
-            <div class="order-item" v-for="item in tableData" :key="item.id">
-              <div class="order-title">
-                <span><el-checkbox v-model="item.checked"></el-checkbox></span>
-                <span class="order-date">{{ item.createTime }}</span>
-                <span class="order-id">订单编号：{{ item.id }}</span>
-                <el-button @click="look(item.id)" size="mini"
-                  >查看订单</el-button
-                >
-              </div>
+          <div class="order-lists" v-if="tableData.length > 0">
+            <div
+              class="order-item"
+              v-for="(item, index) in tableData"
+              :key="index"
+            >
+              <el-row class="order-title">
+                <el-col :span="22">
+                  <span
+                    ><el-checkbox v-model="item.checked"></el-checkbox
+                  ></span>
+                  <span class="order-date">{{
+                    item.createTime | dateFormate
+                  }}</span>
+                  <span class="order-id">订单编号：{{ item.id }}</span>
+                  <span>{{ item.status | statusTozh }}</span>
+                </el-col>
+                <el-col :span="2" class="tr">
+                  <el-button @click="remove(item.id)" size="mini"
+                    ><i class="el-icon-delete"></i
+                  ></el-button>
+                </el-col>
+              </el-row>
               <table
                 style="width:100%;"
                 border="1"
@@ -49,12 +76,28 @@
                 bordercolor="#ECEBEB"
                 class="tc"
               >
-                <tr v-for="product in item.productSkuList" :key="product.id">
+                <tr>
+                  <td colspan="2">商品信息</td>
+                  <td>单价</td>
+                  <td>数量</td>
+                  <td>实付款</td>
+                  <td>操作</td>
+                </tr>
+              </table>
+
+              <table
+                style="width:100%;"
+                border="1"
+                cellspacing="0"
+                bordercolor="#ECEBEB"
+                class="tc"
+              >
+                <tr v-for="(product, num) in item.productSkuList" :key="num">
                   <td>
                     <img
                       :src="product.thumbPictureUrl"
                       width="100%"
-                      height="200"
+                      height="150"
                       alt=""
                     />
                   </td>
@@ -68,39 +111,135 @@
                     <div>(含运费￥0.00)</div>
                   </td>
                   <td>
-                    待付款
-                  </td>
-                  <td>
-                    <el-button>撤销</el-button>
+                    <div>
+                      <router-link to="/" class="link">
+                        <el-button size="mini">查看</el-button>
+                      </router-link>
+                    </div>
+                    <div>
+                      <el-button
+                        v-if="item.status === 4"
+                        size="mini"
+                        @click="evaluate(item.id, product.id)"
+                        >评价</el-button
+                      >
+                    </div>
                   </td>
                 </tr>
               </table>
+
+              <el-row class="order-footer">
+                <el-col :span="12">
+                  <span class="order-money">总金额：{{ item.realMoney }} </span>
+                  <span class="order-money"
+                    >运费：{{ item.shippingMoney }}
+                  </span>
+                </el-col>
+                <el-col :span="12" class="tr">
+                  <el-button @click="getDetail(item.id)" size="mini"
+                    >查看订单</el-button
+                  >
+                  <el-button
+                    v-if="item.status === 1"
+                    size="mini"
+                    @click="pay(item.id)"
+                    >立即支付</el-button
+                  >
+                  <el-button
+                    v-if="item.status === 3"
+                    size="mini"
+                    @click="getLogistics(item.id)"
+                    >查看物流</el-button
+                  >
+                  <el-button
+                    v-if="item.status === 3"
+                    size="mini"
+                    @click="confirm(item.id)"
+                    >确认收货</el-button
+                  >
+                </el-col>
+              </el-row>
             </div>
           </div>
+          <div v-else class="empty">暂无数据</div>
         </el-main>
         <el-footer>
-          <el-pagination background layout="prev, pager, next" :total="15">
+          <el-pagination
+            v-if="tableData.length > 0"
+            background
+            layout="prev, pager, next"
+            :current-page="page.index"
+            :page-size="page.size"
+            :total="page.count"
+          >
           </el-pagination>
         </el-footer>
       </el-container>
     </div>
-    <el-dialog title="收货地址" :visible.sync="dialogFormVisible">
-      <el-form :model="form" inline>
-        <el-form-item
-          v-for="(value, key, i) in form"
-          :label="key + '：'"
-          :key="i"
-          :label-width="formLabelWidth"
-        >
-          {{ value }}
+    <el-dialog title="订单详情" :visible.sync="dialog.formVisible">
+      <el-form v-if="JSON.stringify(form) !== '{}'" :model="form" inline>
+        <el-form-item label="产品数量：">{{
+          form.productSumCount
+        }}</el-form-item>
+        <el-form-item label="产品金额：">{{
+          form.productSumMoney
+        }}</el-form-item>
+        <el-form-item label="运费金额：">{{ form.shippingMoney }}</el-form-item>
+        <el-form-item label="总金额：">{{ form.sumMoney }}</el-form-item>
+        <el-form-item label="物流单号：">{{ form.addressExtSno }}</el-form-item>
+        <el-form-item label="店铺ID：">{{ form.shopId }}</el-form-item>
+        <el-form-item label="支付单号：">{{ form.extSno }}</el-form-item>
+        <el-form-item label="订单创建时间：">{{
+          form.createTimeStamp | dateFormate
+        }}</el-form-item>
+        <el-form-item label="成功支付时间：">{{
+          form.paySuccessTimeStamp | dateFormate
+        }}</el-form-item>
+        <el-form-item label="物流发货时间：">{{
+          form.shipmentsTimeStamp | dateFormate
+        }}</el-form-item>
+        <el-form-item label="确认收货时间：">{{
+          form.receiveTimeStamp | dateFormate
+        }}</el-form-item>
+        <el-form-item label="评价时间：">{{
+          form.evaluateTimeStamp | dateFormate
+        }}</el-form-item>
+        <el-form-item label="订单状态：">{{
+          form.status | statusTozh
+        }}</el-form-item>
+      </el-form>
+    </el-dialog>
+    <el-dialog title="订单评价" :visible.sync="dialog.formVisible2">
+      <el-form :model="form2" ref="form2">
+        <el-form-item label="" prop="content">
+          <el-input
+            type="textarea"
+            v-model="form2.content"
+            placeholder="请输入评价内容"
+          ></el-input>
+        </el-form-item>
+        <el-form-item label="上传图片：">
+          <el-upload
+            :auto-upload="false"
+            :action="$config.ip + $api.upload.img"
+            list-type="picture-card"
+            :file-list="form2.pictureUrlList"
+            :on-preview="handlePictureCardPreview"
+            :on-change="handlePictureCardChange"
+            :on-remove="handleRemove"
+          >
+            <i class="el-icon-plus"></i>
+          </el-upload>
+          <el-dialog :visible.sync="dialog.imgVisible">
+            <img width="100%" :src="form2.pictureUrl" alt="" />
+          </el-dialog>
+        </el-form-item>
+        <el-form-item>
+          <el-button @click="submitComments" type="primary">立即提交</el-button
+          ><el-button @click="resetForm('form2')">重置</el-button
+          >{{ form2.pictureUrlList }}
         </el-form-item>
       </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button @click="dialogFormVisible = false">取 消</el-button>
-        <el-button type="primary" @click="dialogFormVisible = false"
-          >确 定</el-button
-        >
-      </div>
     </el-dialog>
   </div>
 </template>
@@ -116,6 +255,7 @@ export default {
     return {
       checked: false,
       formInline: {
+        status: 0,
         key: ""
       },
       multipleSelection: [],
@@ -125,32 +265,46 @@ export default {
         size: 10,
         count: 0
       },
-      dialogFormVisible: false,
+      loading: {},
+      dialog: {
+        formVisible: false,
+        formVisible2: false,
+        imgVisible: false
+      },
       form: {},
-      formLabelWidth: "120px"
+      form2: {
+        orderId: "",
+        productId: "",
+        content: "",
+        pictureUrl: "",
+        pictureUrlList: []
+      },
+      formLabelWidth: "100px"
     };
   },
   mounted() {
-    this.getList();
+    this.getLists();
   },
   methods: {
-    getList() {
+    search() {
+      this.getLists();
+    },
+    getLists() {
       this.$ajax({
         context: this,
         url: this.$api.order.lists,
         method: "get",
         query: {
-          status: 0,
+          ...this.formInline,
           page: this.page.index,
           size: this.page.size
         },
-        body: {},
         callback: data => {
-          console.log(data);
-          data.map(item => {
+          data.list.map(item => {
             item.checked = false;
           });
-          this.tableData = data;
+          this.tableData = data.list;
+          this.page.count = data.dataCount;
         },
         failback: () => {
           //result:false
@@ -160,8 +314,8 @@ export default {
         }
       });
     },
-    look(id) {
-      this.dialogFormVisible = true;
+    getDetail(id) {
+      this.dialog.formVisible = true;
       this.$ajax({
         context: this,
         url: this.$api.order.detail,
@@ -169,7 +323,6 @@ export default {
         query: {
           id
         },
-        body: {},
         callback: data => {
           console.log(data);
           this.form = data;
@@ -182,31 +335,144 @@ export default {
         }
       });
     },
-    handleSelectionChange(val) {
-      this.multipleSelection = val;
+    remove(id) {
+      this.$ajax({
+        context: this,
+        url: this.$api.order.cancel,
+        method: "post",
+        query: {
+          id
+        },
+        callback: () => {
+          this.getLists();
+        },
+        failback: () => {
+          //result:false
+        },
+        errorback: () => {
+          //404,500
+        }
+      });
     },
-    onSubmit() {
-      console.log(this.formInline);
+    pay() {},
+    getLogistics() {
+      return this.$message.info("正在开发中...");
+    },
+    confirm(id) {
+      this.$ajax({
+        context: this,
+        url: this.$api.order.confirm,
+        method: "post",
+        query: {
+          id
+        },
+        callback: () => {
+          this.getLists();
+        },
+        failback: () => {
+          //result:false
+        },
+        errorback: () => {
+          //404,500
+        }
+      });
+    },
+    evaluate(oid, pid) {
+      this.form2.orderId = oid;
+      this.form2.productId = pid;
+      this.dialog.formVisible2 = true;
+    },
+    handleRemove(file, fileList) {
+      console.log(file, fileList);
+    },
+    handlePictureCardPreview(file, fileList) {
+      console.log("预览", file, fileList);
+    },
+    handlePictureCardChange(file, fileList) {
+      console.log("上传", file, fileList);
+      // console.log('转换',this.$utils.getBase64(file));
+      this.form2.pictureUrl = file.url;
+      this.dialog.imgVisible = true;
+    },
+    submitComments() {
+      this.$ajax({
+        context: this,
+        url: this.$api.order.evaluate,
+        method: "post",
+        body: this.form2,
+        callback: () => {
+          this.resetForm("form2");
+          this.dialog.formVisible2 = false;
+        },
+        failback: () => {
+          //result:false
+        },
+        errorback: () => {
+          //404,500
+        }
+      });
+    },
+    resetForm(formName) {
+      this.$refs[formName].resetFields();
+    }
+  },
+  filters: {
+    statusTozh(value) {
+      if (value === 1) {
+        return "待付款";
+      } else if (value === 2) {
+        return "待发货";
+      } else if (value === 3) {
+        return "待收货";
+      } else if (value === 4) {
+        return "待评价";
+      } else if (value === 5) {
+        return "已结束";
+      } else {
+        return "未知";
+      }
+    }
+  },
+  watch: {
+    tableData: {
+      handler(newVal) {
+        this.multipleSelection = newVal.filter(item => {
+          return item.checked;
+        });
+      },
+      deep: true
     }
   }
 };
 </script>
 <style scoped>
 .order-item {
+  color: #515151;
+  font-size: 14px;
   margin-bottom: 40px;
 }
 .order-title {
-  margin-bottom: 20px;
-  background-color: #eee;
+  background-color: #e9e8e8;
   padding: 6px 10px;
 }
 .order-title span {
   display: inline-block;
-}
-.order-date {
-  margin: 0 20px;
+  vertical-align: middle;
+  margin: 6px 15px 0;
 }
 table td {
-  width: calc(100% / 8);
+  width: calc(100% / 6);
+}
+table td[colspan="2"] {
+  width: calc(100% / 6 * 2);
+}
+.order-footer {
+  padding: 6px 10px;
+  background-color: #e9e8e8;
+}
+.order-money {
+  display: inline-block;
+  margin-top: 4px;
+  margin-right: 15px;
 }
 </style>

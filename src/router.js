@@ -74,6 +74,15 @@ export default new Router({
           }
         },
         {
+          path: "make/:id",
+          component: () =>
+            import(/* webpackChunkName: "make" */ "./views/make.vue"),
+          meta: {
+            name: "生成订单",
+            keepAlive: true
+          }
+        },
+        {
           path: "carts",
           component: () =>
             import(/* webpackChunkName: "carts" */ "./views/carts.vue"),

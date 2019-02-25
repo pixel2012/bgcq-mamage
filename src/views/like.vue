@@ -5,29 +5,21 @@
       <el-container>
         <el-header>
           <el-row>
-            <el-col :span="12">
+            <el-col :span="24">
               <el-button
                 type="danger"
                 :disabled="multipleSelection.length === 0"
+                @click="
+                  remove(
+                    multipleSelection
+                      .map(item => {
+                        return item.id;
+                      })
+                      .join(',')
+                  )
+                "
                 >删除</el-button
               >
-            </el-col>
-            <el-col :span="12">
-              <el-form
-                :inline="true"
-                :model="formInline"
-                class="demo-form-inline tr"
-              >
-                <el-form-item>
-                  <el-input
-                    v-model="formInline.key"
-                    placeholder="请输入关键词"
-                  ></el-input>
-                </el-form-item>
-                <el-form-item>
-                  <el-button type="primary" @click="onSubmit">查询</el-button>
-                </el-form-item>
-              </el-form>
             </el-col>
           </el-row>
         </el-header>
@@ -37,16 +29,16 @@
             border
             stripe
             style="width: 100%"
-            height="100%"
             @selection-change="handleSelectionChange"
           >
             <el-table-column type="selection" width="55"> </el-table-column>
-            <el-table-column prop="date" label="日期"> </el-table-column>
-            <el-table-column prop="name" label="姓名"> </el-table-column>
-            <el-table-column prop="province" label="省份"> </el-table-column>
-            <el-table-column prop="city" label="市区"> </el-table-column>
-            <el-table-column prop="address" label="地址"> </el-table-column>
-            <el-table-column prop="zip" label="邮编"> </el-table-column>
+            <el-table-column label="缩略图">
+              <template slot-scope="scope">
+                <img :src="scope.row.thumbPictureUrl" width="100%" alt="" />
+              </template>
+            </el-table-column>
+            <el-table-column prop="name" label="商品名称"> </el-table-column>
+            <el-table-column prop="price" label="价格"> </el-table-column>
             <el-table-column fixed="right" label="操作" width="100">
               <template slot-scope="scope">
                 <el-button
@@ -55,13 +47,25 @@
                   size="small"
                   >查看</el-button
                 >
-                <el-button type="text" size="small">删除</el-button>
+                <el-button
+                  type="text"
+                  size="small"
+                  @click="remove(scope.row.id)"
+                  >删除</el-button
+                >
               </template>
             </el-table-column>
           </el-table>
         </el-main>
         <el-footer>
-          <el-pagination background layout="prev, pager, next" :total="1000">
+          <el-pagination
+            v-if="tableData.length > 0"
+            background
+            layout="prev, pager, next"
+            :current-page="page.index"
+            :page-size="page.size"
+            :total="page.count"
+          >
           </el-pagination>
         </el-footer>
       </el-container>
@@ -78,84 +82,67 @@ export default {
   components: {},
   data() {
     return {
-      formInline: {
-        key: ""
-      },
       multipleSelection: [],
-      tableData: [
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-03",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-02",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-04",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        },
-        {
-          date: "2016-05-01",
-          name: "王小虎",
-          province: "上海",
-          city: "普陀区",
-          address: "上海市普陀区金沙江路 1518 弄",
-          zip: 200333
-        }
-      ]
+      tableData: [],
+      page: {
+        index: 1,
+        size: 10,
+        count: 0
+      }
     };
   },
+  mounted() {
+    this.getLlists();
+  },
   methods: {
+    getLlists() {
+      this.$ajax({
+        context: this,
+        url: this.$api.collect.lists,
+        method: "get",
+        query: {
+          page: this.page.index,
+          size: this.page.size
+        },
+        callback: data => {
+          // data.list.map(item => {
+          //   item.checked = false;
+          // });
+          this.tableData = data.list;
+          this.page.count = data.dataCount;
+        },
+        failback: () => {
+          //result:false
+        },
+        errorback: () => {
+          //404,500
+        }
+      });
+    },
     handleSelectionChange(val) {
       this.multipleSelection = val;
     },
-    onSubmit() {
-      console.log(this.formInline);
+    handleClick() {
+      this.$message.info("敬请期待");
+    },
+    remove(id) {
+      this.$ajax({
+        context: this,
+        url: this.$api.collect.remove,
+        method: "delete",
+        query: {
+          id
+        },
+        callback: () => {
+          this.getLlists();
+        },
+        failback: () => {
+          //result:false
+        },
+        errorback: () => {
+          //404,500
+        }
+      });
     }
   }
 };
