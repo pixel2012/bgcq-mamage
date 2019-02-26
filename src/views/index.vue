@@ -5,25 +5,37 @@
       <table border="1" cellspacing="0" bordercolor="#ECEBEB" class="tc">
         <tr>
           <td>用户名</td>
-          <td colspan="2" class="username">suwiner</td>
+          <td colspan="2" class="username">
+            {{ $store.state.userInfo.nickName }}
+          </td>
           <td>注册时间</td>
-          <td colspan="2">2019-02-20 16:12:35</td>
+          <td colspan="2">
+            {{ $store.state.userInfo.registerTime | dateFormate }}
+          </td>
         </tr>
         <tr>
           <td>会员类别</td>
-          <td colspan="2">商城客户</td>
+          <td colspan="2">{{ $store.state.userInfo.fromSource }}</td>
           <td>邮箱</td>
-          <td colspan="2">123456@qq.com</td>
+          <td colspan="2">{{ $store.state.userInfo.email }}</td>
         </tr>
         <tr>
           <td>账户余额</td>
-          <td colspan="2">0.00元</td>
+          <td colspan="2">
+            {{ $store.state.userInfo.balance | numToMoney }}元
+          </td>
           <td>新短消息</td>
-          <td colspan="2">无</td>
+          <td colspan="2">{{ $store.state.userInfo.noticeCount }}</td>
+        </tr>
+        <tr>
+          <td>积分</td>
+          <td colspan="2">{{ $store.state.userInfo.integrate }}元</td>
+          <td>优惠券</td>
+          <td colspan="2">{{ $store.state.userInfo.coupon }}</td>
         </tr>
         <tr>
           <td>
-            <router-link to="/">
+            <router-link to="/modified">
               <i class="icon icon-1"></i>
               <div class="em-title">修改资料</div>
             </router-link>
@@ -35,25 +47,25 @@
             </router-link>
           </td>
           <td>
-            <router-link to="/">
+            <router-link to="/order">
               <i class="icon icon-3"></i>
               <div class="em-title">我的订单</div>
             </router-link>
           </td>
           <td>
-            <router-link to="/">
+            <router-link to="/pay">
               <i class="icon icon-4"></i>
               <div class="em-title">在线支付</div>
             </router-link>
           </td>
           <td>
-            <router-link to="/">
+            <router-link to="/like">
               <i class="icon icon-5"></i>
               <div class="em-title">我的收藏</div>
             </router-link>
           </td>
           <td>
-            <router-link to="/">
+            <router-link to="/carts">
               <i class="icon icon-6"></i>
               <div class="em-title">我的购物车</div>
             </router-link>
@@ -67,7 +79,12 @@
 <script>
 export default {
   name: "index",
-  components: {}
+  components: {},
+  data() {
+    return {};
+  },
+  mounted() {},
+  methods: {}
 };
 </script>
 

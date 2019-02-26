@@ -18,7 +18,7 @@ export const location = {
   lists: "/api/member/address/list",
   getDefault: "/api/member/address/default",
   add: "/api/member/address",
-  change: "/api/member/address/saveInfo",
+  edit: "/api/member/address/saveInfo",
   setDefault: "/api/member/address/default",
   remove: "/api/member/address"
 };
@@ -34,7 +34,8 @@ export const order = {
   evaluate: "/api/product/orders/evaluate"
 };
 export const upload = {
-  img: "/api/common/uploadpictrue/base64"
+  base64: "/api/common/uploadpictrue/base64",
+  binary: "/api/common/uploadpictrue/file"
 };
 
 export default {

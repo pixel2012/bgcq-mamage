@@ -7,10 +7,20 @@
             <img src="@/assets/logo.png" class="logo" alt="" />
           </el-col>
           <el-col :span="12" class="user-center tr">
-            <img src="@/assets/img/header.png" class="" alt="" />
+            <img
+              :src="
+                $store.state.userInfo.headImageUrl || '@/assets/img/header.png'
+              "
+              class="avatar"
+              alt=""
+            />
             <img src="@/assets/img/user.png" class="" alt="" />
-            <span class="username">suwiner</span>
-            <img src="@/assets/img/cart.png" class="" alt="" />
+            <router-link to="/">
+              <span class="username">{{ $store.state.userInfo.nickName }}</span>
+            </router-link>
+            <router-link to="/carts">
+              <img src="@/assets/img/cart.png" class="" alt="" />
+            </router-link>
           </el-col>
         </el-row>
       </el-header>
@@ -157,8 +167,27 @@ export default {
     return {};
   },
   created() {},
-  mounted() {},
-  methods: {}
+  mounted() {
+    this.getInfo();
+  },
+  methods: {
+    getInfo() {
+      this.$ajax({
+        context: this,
+        url: this.$api.account.info,
+        method: "get",
+        callback: data => {
+          this.$store.commit("updateUserInfo", data);
+        },
+        failback: () => {
+          //result:false
+        },
+        errorback: () => {
+          //404,500
+        }
+      });
+    }
+  }
 };
 </script>
 

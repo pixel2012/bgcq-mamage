@@ -15,7 +15,7 @@ export default new Router({
           component: () =>
             import(/* webpackChunkName: "default" */ "./views/index.vue"),
           meta: {
-            name: "",
+            name: "会员中心",
             keepAlive: true
           }
         },
@@ -79,7 +79,7 @@ export default new Router({
             import(/* webpackChunkName: "make" */ "./views/make.vue"),
           meta: {
             name: "生成订单",
-            keepAlive: true
+            keepAlive: false
           }
         },
         {

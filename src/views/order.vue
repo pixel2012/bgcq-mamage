@@ -211,21 +211,28 @@
     </el-dialog>
     <el-dialog title="订单评价" :visible.sync="dialog.formVisible2">
       <el-form :model="form2" ref="form2">
-        <el-form-item label="" prop="content">
+        <el-form-item
+          label="评价内容"
+          prop="content"
+          :label-width="formLabelWidth"
+        >
           <el-input
             type="textarea"
             v-model="form2.content"
+            :rows="4"
             placeholder="请输入评价内容"
           ></el-input>
         </el-form-item>
-        <el-form-item label="上传图片：">
+        <el-form-item label="上传图片" :label-width="formLabelWidth">
           <el-upload
-            :auto-upload="false"
-            :action="$config.ip + $api.upload.img"
+            ref="upload"
+            :action="$config.ip + $api.upload.binary"
+            :headers="{
+              token: $config.token
+            }"
             list-type="picture-card"
-            :file-list="form2.pictureUrlList"
-            :on-preview="handlePictureCardPreview"
-            :on-change="handlePictureCardChange"
+            :before-upload="beforeUpload"
+            :on-success="handlePictureCardSuccess"
             :on-remove="handleRemove"
           >
             <i class="el-icon-plus"></i>
@@ -237,7 +244,7 @@
         <el-form-item>
           <el-button @click="submitComments" type="primary">立即提交</el-button
           ><el-button @click="resetForm('form2')">重置</el-button
-          >{{ form2.pictureUrlList }}
+          >{{ form2.pictureUrlLists }}
         </el-form-item>
       </el-form>
     </el-dialog>
@@ -277,9 +284,9 @@ export default {
         productId: "",
         content: "",
         pictureUrl: "",
-        pictureUrlList: []
+        pictureUrlList: ""
       },
-      formLabelWidth: "100px"
+      formLabelWidth: "80px"
     };
   },
   mounted() {
@@ -382,17 +389,31 @@ export default {
       this.form2.productId = pid;
       this.dialog.formVisible2 = true;
     },
+    beforeUpload(file) {
+      console.log(file.type);
+      const isJPG = file.type === "image/jpeg" || file.type === "image/png";
+      const isLt2M = file.size / 1024 / 1024 < 2;
+
+      if (!isJPG) {
+        this.$message.error("上传头像图片只能是 JPG或PNG 格式!");
+      }
+      if (!isLt2M) {
+        this.$message.error("上传头像图片大小不能超过 2MB!");
+      }
+      return isJPG && isLt2M;
+    },
     handleRemove(file, fileList) {
-      console.log(file, fileList);
+      this.form2.pictureUrlList = this.updatePictureUrl(fileList);
     },
-    handlePictureCardPreview(file, fileList) {
-      console.log("预览", file, fileList);
+    handlePictureCardSuccess(response, file, fileList) {
+      this.form2.pictureUrlList = this.updatePictureUrl(fileList);
     },
-    handlePictureCardChange(file, fileList) {
-      console.log("上传", file, fileList);
-      // console.log('转换',this.$utils.getBase64(file));
-      this.form2.pictureUrl = file.url;
-      this.dialog.imgVisible = true;
+    updatePictureUrl(fileList) {
+      return fileList
+        .map(list => {
+          return list.response.data.thumbPictureUrl;
+        })
+        .join(",");
     },
     submitComments() {
       this.$ajax({
@@ -401,8 +422,10 @@ export default {
         method: "post",
         body: this.form2,
         callback: () => {
+          this.$refs.upload.clearFiles();
           this.resetForm("form2");
           this.dialog.formVisible2 = false;
+          this.getLists();
         },
         failback: () => {
           //result:false

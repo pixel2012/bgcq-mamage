@@ -177,7 +177,24 @@ export default {
       });
     },
     handleChange(value, row) {
-      row.productskuSumMoney = row.productSkuPrice * value;
+      this.$ajax({
+        context: this,
+        url: this.$api.cart.changeNumber,
+        method: "post",
+        body: {
+          id: row.id,
+          number: value
+        },
+        callback: () => {
+          row.productskuSumMoney = row.productSkuPrice * value;
+        },
+        failback: () => {
+          //result:false
+        },
+        errorback: () => {
+          //404,500
+        }
+      });
     },
     making() {
       this.$router.push({

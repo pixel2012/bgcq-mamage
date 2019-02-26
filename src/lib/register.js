@@ -26,13 +26,14 @@ register.install = Vue => {
   Vue.component("breadcrumb", breadcrumb);
 
   //4.添加过滤器
-  Vue.filter("dateFormate", function(value) {
+  Vue.filter("dateFormate", value => {
     if (value == 0) {
       return "暂无";
     } else {
       return moment.unix(value).format("YYYY-MM-DD HH:mm"); // 这是时间戳转时间
     }
   });
+  Vue.filter("numToMoney", utils.numToMoney);
 
   // 5. 添加实例方法
   // Vue.prototype.$myMethod = function (methodOptions) {

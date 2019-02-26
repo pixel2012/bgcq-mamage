@@ -21,38 +21,40 @@ export const numToMoney = num => {
     return num + floatPart;
   }
 };
-//金钱格式化数字展示
-export const moneyToNum = value => {
-  if (typeof value == "number") {
-    return value;
-  } else {
-    if (value.indexOf(",") != -1) {
-      return Number(value);
-    } else {
-      return Number(value.replace(",", ""));
-    }
+
+export const cityFormate = regions => {
+  let cities = [];
+  for (let province in regions.province_list) {
+    cities.push({
+      label: regions.province_list[province],
+      value: province,
+      children: []
+    });
   }
+  cities.forEach(list => {
+    for (let city in regions.city_list) {
+      if (list.value.slice(0, 2) === city.slice(0, 2)) {
+        list.children.push({
+          label: regions.city_list[city],
+          value: city,
+          children: []
+        });
+        for (let county in regions.county_list) {
+          let index = list.children.length - 1;
+          if (city.slice(0, 4) === county.slice(0, 4)) {
+            list.children[index].children.push({
+              label: regions.county_list[county],
+              value: county
+            });
+          }
+        }
+      }
+    }
+  });
+  return cities;
 };
 
-//图片转base64
-export const getBase64 = file => {
-  return new Promise(function(resolve, reject) {
-    let reader = new FileReader();
-    let imgResult = "";
-    reader.readAsDataURL(file.row);
-    reader.onload = function() {
-      imgResult = reader.result;
-    };
-    reader.onerror = function(error) {
-      reject(error);
-    };
-    reader.onloadend = function() {
-      resolve(imgResult);
-    };
-  });
-};
 export default {
   numToMoney,
-  moneyToNum,
-  getBase64
+  cityFormate
 };

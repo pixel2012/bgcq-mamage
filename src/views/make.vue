@@ -17,8 +17,12 @@
         </el-header>
         <el-main>
           <div style="margin-bottom: 10px;">
-              收货地址：
-            <el-select v-model="value" placeholder="请选择收货地址">
+            收货地址：
+            <el-select
+              v-model="addressId"
+              placeholder="请选择收货地址"
+              style="width: 90%;"
+            >
               <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -83,36 +87,61 @@ export default {
   components: {},
   data() {
     return {
-      options: [
-        {
-          value: "选项1",
-          label: "黄金糕"
-        },
-        {
-          value: "选项2",
-          label: "双皮奶"
-        },
-        {
-          value: "选项3",
-          label: "蚵仔煎"
-        },
-        {
-          value: "选项4",
-          label: "龙须面"
-        },
-        {
-          value: "选项5",
-          label: "北京烤鸭"
-        }
-      ],
-      value: "",
+      options: [],
+      addressId: "",
       order: {}
     };
   },
   mounted() {
     this.getLlists();
+    this.getAddressLists();
+    this.getAddressDefault();
   },
   methods: {
+    getAddressDefault() {
+      this.$ajax({
+        context: this,
+        url: this.$api.location.getDefault,
+        method: "get",
+        callback: data => {
+          this.addressId = data.id;
+        },
+        failback: () => {
+          //result:false
+        },
+        errorback: () => {
+          //404,500
+        }
+      });
+    },
+    getAddressLists() {
+      this.$ajax({
+        context: this,
+        url: this.$api.location.lists,
+        method: "get",
+        callback: data => {
+          data.list.forEach(item => {
+            this.options.push({
+              label:
+                item.realName +
+                " " +
+                item.phoneNumber +
+                "， " +
+                item.provinceName +
+                item.cityName +
+                item.countyName,
+              value: item.id
+            });
+          });
+        },
+        failback: () => {
+          //result:false
+        },
+        errorback: () => {
+          //404,500
+        }
+      });
+    },
     getLlists() {
       this.$ajax({
         context: this,
@@ -166,7 +195,8 @@ export default {
         url: this.$api.cart.createOrder,
         method: "post",
         body: {
-          ids: this.$route.params.id
+          ids: this.$route.params.id,
+          addressId: this.addressId
         },
         callback: () => {
           this.$message.info("跳转去支付");
