@@ -69,7 +69,7 @@
         <!--layout="prev, pager, next"-->
         <!--:current-page="page.index"-->
         <!--:page-size="page.size"-->
-        <!--:total="page.count"-->
+        <!--:total="page.total"-->
         <!--&gt;-->
         <!--</el-pagination>-->
         <!--</el-footer>-->

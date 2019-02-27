@@ -170,7 +170,7 @@
             layout="prev, pager, next"
             :current-page="page.index"
             :page-size="page.size"
-            :total="page.count"
+            :total="page.total"
           >
           </el-pagination>
         </el-footer>
