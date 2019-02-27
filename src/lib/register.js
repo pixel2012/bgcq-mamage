@@ -5,6 +5,7 @@ import utils from "./utils";
 import ajax from "./ajax";
 import { sessionStore, localStore } from "./store";
 import _ from "lodash";
+import cookie from "js-cookie";
 import moment from "moment";
 import breadcrumb from "../components/breadcrumb";
 
@@ -45,6 +46,7 @@ register.install = Vue => {
   Vue.prototype.$sessionStore = sessionStore;
   Vue.prototype.$localStore = localStore;
   Vue.prototype.$_ = _;
+  Vue.prototype.$cookie = cookie;
   Vue.prototype.$moment = moment;
 };
 export default register;

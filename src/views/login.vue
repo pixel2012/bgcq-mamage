@@ -1,7 +1,7 @@
 <template>
   <div class="login">
     <div class="login-model">
-      <div class="login-title">智汇魔方后台管理系统 v3.0</div>
+      <div class="login-title">博古传奇后台管理系统</div>
       <el-form
         :model="ruleForm"
         :rules="rules"

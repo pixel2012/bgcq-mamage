@@ -15,8 +15,7 @@ export const ajax = function(params) {
     method: params.method || "get",
     headers: {
       ...(params.headers || {}),
-      token: config.token
-      //localStore.get("token") ? localStore.get("token") : ""
+      token: params.context.$cookie.get("token") || ""
       // timestamp: "#js" + encrypt(parseInt(new Date().getTime() / 1000) + "")
     },
     data: params.body
@@ -36,7 +35,8 @@ export const ajax = function(params) {
         if (res.data.code == 401) {
           // localStore.remove('token');
           // params.context.$store.state.headerStore.info.isLogin = false;//下线
-          params.context.$router.push("/login");
+          // params.context.$router.push("/login");
+          location.href = config.login;
         }
       }
     })
